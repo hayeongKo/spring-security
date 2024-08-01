@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration // 빈 등록
@@ -19,6 +20,12 @@ public class SecurityConfig {
 //                .anyRequest().permitAll();
 //    }
 
+    //해당 메서드의 리턴되는 오브젝트를 IoC로 등록해줌
+    @Bean
+    public BCryptPasswordEncoder encodePwd() {
+        return new BCryptPasswordEncoder();
+    }
+
     //spring boot 3 이후부터 WebSecurityConfigurerAdapter deprecated
     //따라서 따로 필터체인을 정의하여 사용해야함
     @Bean
@@ -31,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // /admin/** 경로는 ROLE_ADMIN 권한을 가진 사용자만 접근 가능
                         .anyRequest().permitAll() // 그 외의 모든 요청은 인증 없이 접근 가능
                 )
-                .formLogin(formLogin -> formLogin.loginPage("/login"))
+                .formLogin(formLogin -> formLogin.loginPage("/loginForm"))
         ;
         return http.build();
     }
