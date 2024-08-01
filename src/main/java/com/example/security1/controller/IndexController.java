@@ -40,7 +40,6 @@ public class IndexController {
         return "manager";
     }
 
-    // spring security가 먼저 낚아챔 -> securityConfig 파일 생성 후 작동 X
     @GetMapping("/loginForm")
     public String loginForm() {
         return "loginForm";
@@ -51,19 +50,20 @@ public class IndexController {
         return "joinForm";
     }
 
+    // spring security가 먼저 낚아챔 -> securityConfig 파일 생성 후 작동 X
 //    @GetMapping("/login")
 //    public String login() {
-//        return "loginForm";
+//        return "login";
 //    }
 
     @PostMapping("/join")
-    public @ResponseBody String join(User user) {
+    public String join(User user) {
         System.out.println(user);
         user.setRole("ROLE_USER");
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user); //회원가입은 잘되는데 비밀번호: 1234 -> 시큐리티로 로그인을 할 수 없음.
         //이유는 패스워드가 암호화가 안되었기 때문
-        return "redirect:/loginForm"; //loginForm이라는 함수를 호출해줌
+        return "redirect:/loginForm";
     }
 
 }
