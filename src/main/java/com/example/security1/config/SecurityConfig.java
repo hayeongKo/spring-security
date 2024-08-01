@@ -38,7 +38,11 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // /admin/** 경로는 ROLE_ADMIN 권한을 가진 사용자만 접근 가능
                         .anyRequest().permitAll() // 그 외의 모든 요청은 인증 없이 접근 가능
                 )
-                .formLogin(formLogin -> formLogin.loginPage("/loginForm"))
+                .formLogin(formLogin -> {
+                    formLogin.loginPage("/loginForm");
+                    formLogin.loginProcessingUrl("/login"); // /login 주소가 호출되면 security가 낚아채서 대신 로그인을 진행해줌 -> controller /login을 만들지 않아도 됨
+                    formLogin.defaultSuccessUrl("/"); //성공시 리다이렉트할 url
+                })
         ;
         return http.build();
     }
