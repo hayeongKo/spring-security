@@ -1,5 +1,7 @@
 package com.example.security1.config;
 
+import com.example.security1.config.oauth.PrincipalOauth2UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -10,17 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration // 빈 등록
 @EnableWebSecurity //활성화가 되어야 하니까 -> spring security filter(security config)가 filter chain에 등록됨
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true) //secured 어노테이션 활성화, preAuthorize 어노테이션 활성화
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+//@Secured 활성화, @PreAuthorize & @PostAuthorize 활성화
 public class SecurityConfig {
-//    @Bean
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeHttpRequests()
-//                .requestMatchers("/user/**").authenticated()
-//                .requestMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-//                .requestMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-//                .anyRequest().permitAll();
-//    }
+
+    @Autowired
+    private PrincipalOauth2UserService principalOauth2UserService;
 
     //해당 메서드의 리턴되는 오브젝트를 IoC로 등록해줌
     @Bean
@@ -45,6 +42,18 @@ public class SecurityConfig {
                     formLogin.loginProcessingUrl("/login"); // /login 주소가 호출되면 security가 낚아채서 대신 로그인을 진행해줌 -> controller /login을 만들지 않아도 됨
                     formLogin.defaultSuccessUrl("/"); //성공시 리다이렉트할 url
                 })
+                // 구글 로그인 완료 뒤 후처리 구현해야함. Tip.코드 X, (엑세스토큰+사용자프로필정보 O)
+                // ----------------------------------------------------------------
+                // 1. 코드받기(인증) 2. 엑세스토큰
+                // 3. 사용자프로필 정보를 가져오고
+                // 4-1. 그 정보를 토대로 회원가입을 자동으로 진행시키기도 함
+                // 4-2. (이메일, 전화번호, 이름, 아이디) 쇼핑몰 -> 지부소, 백화점몰 -> (vip등급, 일반등급)
+                .oauth2Login(oauth2Login -> {
+                            oauth2Login.loginPage("/loginForm");
+                            oauth2Login.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                    .userService(principalOauth2UserService));
+                        }
+                )
         ;
         return http.build();
     }
