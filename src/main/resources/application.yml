@@ -14,10 +14,10 @@ spring:
     username: cos
     password: cos1234
 
-#  mvc:
-#    view:
-#      prefix: /templates/
-#      suffix: .mustache
+  #  mvc:
+  #    view:
+  #      prefix: /templates/
+  #      suffix: .mustache
 
   jpa:
     hibernate:
@@ -25,3 +25,14 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: #어쩌구
+            client-secret: #저쩌구
+            scope:
+            - email
+            - profile
