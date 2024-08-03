@@ -1,11 +1,15 @@
 package com.example.security1.controller;
 
+import com.example.security1.config.auth.PrincipalDetails;
 import com.example.security1.model.User;
 import com.example.security1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +17,32 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller //view를 리턴하겠다
 public class IndexController {
+
+    @GetMapping("/test/login")
+    public @ResponseBody String testLogin(Authentication authentication, @AuthenticationPrincipal PrincipalDetails userDetails) {
+        // DI(의존성 주입)
+        System.out.println("/test/login =======================");
+        //principalDetails를 리턴함 (다운캐스팅)
+        //원래는 UserDetails(default)로 받아오지만 우리가 구현한 PrincipalDetails가 UserDetails를 상속받아 구현했기 때문에
+        //PrincipalDetails로도 받아올 수 있움
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        System.out.println("authentication = " + principalDetails.getUser());
+
+        System.out.println("userDetails = " + userDetails.getUser());
+        return "세션 정보 확인하기";
+    }
+
+    @GetMapping("/test/oauth/login")
+    public @ResponseBody String testOAuthLogin(Authentication authentication, @AuthenticationPrincipal OAuth2User oauth) {
+        // DI(의존성 주입)
+        System.out.println("/test/oauth/login =======================");
+        //OAuth2User로 받아옴 (다운캐스팅)
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        System.out.println("authentication = " + oAuth2User.getAttributes());
+        System.out.println("oAuth2User = " + oauth.getAttributes());
+        return "OAuth 세션 정보 확인하기";
+    }
+
     @Autowired
     private UserRepository userRepository;
 
